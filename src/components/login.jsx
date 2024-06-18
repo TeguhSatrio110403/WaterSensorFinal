@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import {useNavigate} from "react-router-dom"
+import { redirect } from 'react-router-dom'; // Import useHistory from react-router-dom
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
 
-const login = () => {
+const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate(); // Menginisialisasi useNavigate
 
-  const navigate = useNavigate();
-  
   const onSubmit = (e) => {
+    e.preventDefault();
 
     const dataToSend = {
       username: username,
@@ -18,24 +19,27 @@ const login = () => {
 
     axios.post('http://localhost:3000/login', dataToSend)
       .then(response => {
-        console.log('POST request successful:', response.data);
-        // Handle response if needed, e.g., redirect to dashboard
+        console.log('POST request successful:', response);
         localStorage.setItem('isLoggedIn', true);
-        navigate("/dashboard")
+        console.log(response.status)
+        if (response.status === 200) {
+          navigate('/dashboard'); // Redirect menggunakan navigate function
+        }else{
+          return;
+        }
       })
-
       .catch(error => {
         console.error('Error sending POST request:', error);
         if (error.response && error.response.status === 401) {
           setErrorMessage('Username or password is incorrect');
-          e.preventDefault();
         } else {
           setErrorMessage('An error occurred during login');
-          e.preventDefault();
         }
-    e.preventDefault(); // Prevent default form submission behavior
       });
-        
+      
+console.log(response)
+
+     
   };
 
   return (
@@ -44,7 +48,7 @@ const login = () => {
         <h1>LOGIN</h1>
         <img src="./Security-pana.svg" alt="Security Icon" />
 
-        <form  onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} method="post">
           <div className="form-input">
             <input onChange={(e) => setUsername(e.target.value)} type="text" id="username" name="username" required />
             <span></span>
@@ -65,4 +69,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;
