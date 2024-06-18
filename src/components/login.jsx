@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import {useNavigate} from "react-router-dom"
 import axios from 'axios';
 
 const login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const navigate = useNavigate();
   
   const onSubmit = (e) => {
 
@@ -18,7 +21,7 @@ const login = () => {
         console.log('POST request successful:', response.data);
         // Handle response if needed, e.g., redirect to dashboard
         localStorage.setItem('isLoggedIn', true);
-        location.href = "/dashboard";
+        navigate("/dashboard")
       })
 
       .catch(error => {
