@@ -18,6 +18,7 @@ const login = () => {
         console.log('POST request successful:', response.data);
         // Handle response if needed, e.g., redirect to dashboard
         localStorage.setItem('isLoggedIn', true);
+        location.href = "/dashboard";
       })
 
       .catch(error => {
@@ -40,7 +41,7 @@ const login = () => {
         <h1>LOGIN</h1>
         <img src="./Security-pana.svg" alt="Security Icon" />
 
-        <form action='/dashboard' onSubmit={onSubmit}>
+        <form  onSubmit={onSubmit}>
           <div className="form-input">
             <input onChange={(e) => setUsername(e.target.value)} type="text" id="username" name="username" required />
             <span></span>
