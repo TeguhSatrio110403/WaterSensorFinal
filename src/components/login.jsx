@@ -6,8 +6,6 @@ const login = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   
-
-
   const onSubmit = (e) => {
 
     const dataToSend = {
@@ -19,17 +17,21 @@ const login = () => {
       .then(response => {
         console.log('POST request successful:', response.data);
         // Handle response if needed, e.g., redirect to dashboard
+        localStorage.setItem('isLoggedIn', true);
       })
+
       .catch(error => {
         console.error('Error sending POST request:', error);
         if (error.response && error.response.status === 401) {
           setErrorMessage('Username or password is incorrect');
+          e.preventDefault();
         } else {
           setErrorMessage('An error occurred during login');
+          e.preventDefault();
         }
     e.preventDefault(); // Prevent default form submission behavior
       });
-        localStorage.setItem('isLoggedIn', true);
+        
   };
 
   return (
