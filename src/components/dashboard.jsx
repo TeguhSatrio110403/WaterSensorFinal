@@ -3,13 +3,12 @@ import {
   MapContainer,
   TileLayer,
   Marker,
+  Popup,
   useMap,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Card } from 'react-bootstrap';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import HookMqtt from '../service/hook'
+import HookMqtt from '../service/hook';
 
 const RecenterAutomatically = ({ lat, lng }) => {
   const map = useMap();
@@ -23,6 +22,30 @@ const Dashboard = () => {
   const [position, setPosition] = useState([-6.34605, 106.69156]);
   const [history, setHistory] = useState([]);  
 
+  // Function to get user's current location
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setPosition([latitude, longitude]);
+          setHistory(prevHistory => [...prevHistory, [latitude, longitude]]);
+        },
+        (error) => {
+          console.error("Error fetching geolocation: ", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  };
+
+  useEffect(() => {
+    getUserLocation();
+    const interval = setInterval(getUserLocation, 5000); // Update location every 5 seconds
+    return () => clearInterval(interval); // Clean up interval on unmount
+  }, []);
+
   return (
     <div>
       <section>
@@ -31,7 +54,7 @@ const Dashboard = () => {
           <div className="details" id="map" style={{ height: '580px' }}>
             <MapContainer
               center={position}
-              zoom={100}
+              zoom={16} // Adjust zoom level as needed
               scrollWheelZoom={true}
               style={{ height: '100%', width: '100%' }}
             >
@@ -39,20 +62,27 @@ const Dashboard = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <Marker position={position} />
+              <Marker position={position} onClick={() => alert(`Latitude: ${position[0]}, Longitude: ${position[1]}`)}>
+                <Popup>
+                  Latitude: {position[0]}, Longitude: {position[1]}
+                </Popup>
+              </Marker>
               <RecenterAutomatically lat={position[0]} lng={position[1]} />
               {history.map((pos, idx) => (
-                <Marker key={idx} position={pos} />
+                <Marker key={idx} position={pos} onClick={() => alert(`Latitude: ${pos[0]}, Longitude: ${pos[1]}`)}>
+                  <Popup>
+                    Latitude: {pos[0]}, Longitude: {pos[1]}
+                  </Popup>
+                </Marker>
               ))}
             </MapContainer>
           </div>
         </div>
 
         <div className="app">
-          <HookMqtt/>
+          <HookMqtt />
         </div>
       </section>
-    
     </div>
   );
 };
